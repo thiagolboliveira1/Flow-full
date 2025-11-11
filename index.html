@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#0F172A"/><meta name="apple-mobile-web-app-capable" content="yes"/>
+<link rel="manifest" href="manifest.webmanifest"/><link rel="apple-touch-icon" href="icons/icon-192.png"/>
+<title>FLOW — Sistema Financeiro</title>
+<style>
+:root{--bg:#0f172a;--card:#111827;--muted:#94a3b8;--primary:#7c3aed;--accent:#10b981;--danger:#ef4444}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto}
+.wrap{max-width:1100px;margin:0 auto;padding:20px}.card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:14px}
+.grid{display:grid;gap:16px}.grid2{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:repeat(3,1fr)}
+input,select,button{width:100%;padding:11px;border-radius:12px;border:1px solid #1f2937;background:#0b1220;color:#fff}
+button{background:var(--primary);border-color:transparent;font-weight:600;cursor:pointer}.ghost{background:#0b1220;border:1px solid #334155}
+.muted{color:var(--muted)}.ok{color:var(--accent)}.bad{color:var(--danger)}.hide{display:none}table{width:100%;border-spacing:0 8px}
+th{color:#cbd5e1;text-align:left;padding:8px}td{background:#0b1220;border:1px solid #1f2937;padding:8px}
+.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:12px}
+</style></head><body>
+<div class="wrap">
+  <div class="tabs">
+    <button class="ghost" data-tab="auth">Login</button>
+    <button class="ghost" data-tab="dash">Dashboard</button>
+    <button class="ghost" data-tab="trans">Transações</button>
+    <button class="ghost" data-tab="parc">Parcelamentos</button>
+    <button class="ghost" data-tab="metas">Metas</button>
+    <button class="ghost" data-tab="cards">Cartões</button>
+    <button class="ghost" data-tab="rel">Relatório</button>
+    <button id="btnInstall" class="ghost">Instalar</button>
+  </div>
+
+  <section id="auth" class="grid grid2">
+    <div class="card"><h2>Entrar</h2><div class="grid grid2">
+      <input id="loginEmail" type="email" placeholder="E-mail"/><input id="loginPass" type="password" placeholder="Senha"/>
+    </div><div style="display:flex;gap:8px;margin-top:10px">
+      <button id="btnLogin">Entrar</button><button id="btnAnon" class="ghost">Teste sem conta</button></div></div>
+    <div class="card"><h2>Criar conta</h2><div class="grid grid2">
+      <input id="regEmail" type="email" placeholder="E-mail"/><input id="regPass" type="password" placeholder="Senha (mín. 6)"/>
+    </div><button id="btnRegister" style="margin-top:10px">Criar minha conta</button></div>
+  </section>
+
+  <section id="dash" class="hide">
+    <div class="grid grid3">
+      <div class="card"><div class="muted">Ganhos do mês</div><b id="kpiIncome">R$ 0,00</b></div>
+      <div class="card"><div class="muted">Gastos do mês</div><b id="kpiExpense">R$ 0,00</b></div>
+      <div class="card"><div class="muted">Saldo</div><b id="kpiBalance">R$ 0,00</b></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>Limites por categoria</h3><div id="budgets"></div></div>
+  </section>
+
+  <section id="trans" class="hide">
+    <div class="grid grid2">
+      <div class="card"><h3>Nova transação</h3><div class="grid grid2">
+        <select id="type"><option value="income">Receita</option><option value="expense">Despesa</option></select>
+        <input id="amount" type="number" step="0.01" placeholder="Valor (R$)"/>
+      </div><div class="grid grid2" style="margin-top:8px">
+        <input id="category" placeholder="Categoria"/><input id="date" type="date"/>
+      </div><input id="desc" placeholder="Descrição" style="margin-top:8px"/>
+      <button id="addTx" style="margin-top:10px">Adicionar</button><p id="msg" class="muted"></p></div>
+      <div class="card"><h3>Novo limite</h3><div class="grid grid2">
+        <input id="bCat" placeholder="Categoria"/><input id="bLimit" type="number" step="0.01" placeholder="Limite (R$)"/>
+      </div><button id="saveBudget" style="margin-top:10px">Salvar limite</button></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>Transações</h3>
+      <table><thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+      <tbody id="txTable"></tbody></table></div>
+  </section>
+
+  <section id="parc" class="hide">
+    <div class="card"><h3>Novo parcelamento</h3><div class="grid grid2">
+      <input id="pDesc" placeholder="Descrição"/><input id="pTotal" type="number" step="0.01" placeholder="Valor total"/>
+    </div><div class="grid grid2" style="margin-top:8px">
+      <input id="pQtd" type="number" placeholder="Nº parcelas"/><input id="pPrimeira" type="date"/>
+    </div><input id="pCartao" placeholder="Cartão/Banco" style="margin-top:8px"/>
+    <button id="addParc" style="margin-top:10px">Adicionar parcelamento</button></div>
+    <div class="card" style="margin-top:12px"><h3>Meus parcelamentos</h3><div id="parcs"></div></div>
+  </section>
+
+  <section id="metas" class="hide">
+    <div class="card"><h3>Nova meta</h3><div class="grid grid2">
+      <input id="mTitulo" placeholder="Título"/><input id="mValor" type="number" step="0.01" placeholder="Valor alvo"/>
+    </div><div class="grid grid2" style="margin-top:8px">
+      <input id="mPrazo" type="date"/><input id="mImagem" placeholder="URL da imagem"/>
+    </div><button id="addMeta" style="margin-top:10px">Adicionar meta</button></div>
+    <div class="card" style="margin-top:12px"><h3>Metas e progresso</h3><div id="metasBox"></div></div>
+  </section>
+
+  <section id="cards" class="hide">
+    <div class="card"><h3>Novo cartão</h3><div class="grid grid2">
+      <input id="cBanco" placeholder="Banco"/><input id="cLimite" type="number" step="0.01" placeholder="Limite"/>
+    </div><div class="grid grid2" style="margin-top:8px">
+      <input id="cVenc" type="number" placeholder="Dia de vencimento"/><input id="cBandeira" placeholder="Bandeira"/>
+    </div><button id="addCard" style="margin-top:10px">Salvar cartão</button></div>
+    <div class="card" style="margin-top:12px"><h3>Meus cartões</h3><div id="cardsBox"></div></div>
+  </section>
+
+  <section id="rel" class="hide">
+    <div class="card"><h3>Relatório anual</h3>
+      <table><thead><tr><th>Mês</th><th>Ganhos</th><th>Gastos</th><th>Saldo</th></tr></thead><tbody id="relTable"></tbody></table>
+    </div>
+  </section>
+</div>
+<script type="module" src="app.js"></script></body></html>
